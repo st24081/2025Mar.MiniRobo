@@ -6,13 +6,13 @@
 
 class Suspension
 {
-  std::array<RoboMaster::RoboMasFB , 2> motors;
+  std::array<RoboMasFB , 2> motors;
   Udon::PidController pid;
   Gyro gyro;
   uint turnTime;
   
   public :
-  Suspension(std::array<RoboMaster::RoboMasFB , 2>&& motors , Udon::PidController&& pid , Gyro&& gyro)
+  Suspension(std::array<RoboMasFB , 2>&& motors , Udon::PidController&& pid , Gyro&& gyro)
   : motors{ std::move(motors) }
   , pid{ std::move(pid) }
   , gyro{ std::move(gyro) }
@@ -70,5 +70,4 @@ class Suspension
     pid.clearPower();
     gyro.clear();
   }
-  
 };

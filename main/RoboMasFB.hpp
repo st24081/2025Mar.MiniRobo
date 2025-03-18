@@ -2,8 +2,7 @@
 
 #include <Udon.hpp>
 
-namespace RoboMaster
-{
+
   class RoboMasFB
   {
     Udon::RoboMasterC610 motor;
@@ -28,4 +27,3 @@ namespace RoboMaster
       motor.setCurrent(0);
     }
   };
-}//namespace RoboMaster
