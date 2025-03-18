@@ -2,7 +2,6 @@
 
 #include <Udon.hpp>
 
-
   class RoboMasFB
   {
     Udon::RoboMasterC610 motor;
@@ -20,7 +19,7 @@
       const auto current = pid(motor.getVelocity(), targetVelocity);
       motor.setCurrent(current);
     }
- 
+
     void stop()
     {
       pid.clearPower();

@@ -48,11 +48,11 @@ private:
         {
             if (current > 0)
             {
-                offset -= Udon::TwoPi;
+              offset -= Udon::TwoPi;
             }
             else if (current < 0)
             {
-                offset += Udon::TwoPi;
+              offset += Udon::TwoPi;
             }
         }
         return current + offset;
