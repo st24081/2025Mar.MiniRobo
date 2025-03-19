@@ -77,11 +77,11 @@ void loop()
     // {
       if(!pad.getSquare().toggle)
       {
-        suspension.moveLikeOmni(pad.getMoveInfo() , maxPower);
+        suspension.moveLikeOmni(pad.getMoveInfo() , maxPower , pad.getL2().press);
       }
       else
       {
-        suspension.moveSuchStick( pad.getLeftStick().y , pad.getRightStick().y , maxPower );
+        suspension.moveSuchStick( pad.getLeftStick().y , pad.getRightStick().y , maxPower , pad.getL2().press);
       }
 
       if(pad.getR1().press)
@@ -99,22 +99,17 @@ void loop()
         //Serial.println( 20 );
         destroyer.setMessage( powers[2] );
       }
-      else if(pad.getL2().press)
-      {
-        //Serial.println( -20 );
-        destroyer.setMessage( powers[3] );
-      }
       else 
       {
         //Serial.println( 0 );
         destroyer.setMessage( {0} );
       }
 
-      if(pad.getUp().click)
-      {
-        suspension(false);
-        flag(false);
-      }
+      // if(pad.getUp().click)
+      // {
+      //   suspension(false);
+      //   flag(false);
+      // }
     //}
     // else
     // {

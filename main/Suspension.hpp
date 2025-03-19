@@ -29,15 +29,24 @@ class Suspension
     gyro.begin();
   }
 
-  void moveLikeOmni(Udon::Stick moveInfo, double limitPower)
+  void moveLikeOmni(Udon::Stick moveInfo, double limitPower , bool L2)
   {
     gyro.update();
     double length = moveInfo.vector.length();
     Serial.println(length);
 
     double stickAngle = 0;
-    if(moveInfo.vector.x || moveInfo.vector.y )
+    if(!L2)
     {
+      if(moveInfo.vector.x || moveInfo.vector.y )
+      {
+        stickAngle = moveInfo.vector.angle();
+      }
+    }
+    else
+    {
+      stickAngle = Udon::Pi;
+      moveInfo.vector *= -1; 
       stickAngle = moveInfo.vector.angle();
     }
 
@@ -89,9 +98,15 @@ class Suspension
     // }
     moveInfo.turn -= pidGyro.getPower();
     Serial.println(stickAngle);
-
+    
     double leftMove = -length + moveInfo.turn;
     double rightMove = length + moveInfo.turn;
+
+    if(L2)
+    {
+      leftMove *= -1;
+      rightMove *= -1;
+    }
 
     Serial.println(leftMove);
     Serial.println(rightMove);
@@ -118,12 +133,18 @@ class Suspension
     motors[1].move( rightMove );
   }
 
-  void moveSuchStick(int leftY , int rightY , double maxPower)
+  void moveSuchStick(int leftY , int rightY , double maxPower , bool L2)
   {
     leftY *= (maxPower / 255 );
     rightY  *= (maxPower / 255 );
     leftY = map( leftY , -255 , 255 , -10000 , 10000 );
     rightY = map( rightY , -255 , 255 , -10000 , 10000 );
+
+    if(L2)
+    {
+      leftY *= -1;
+      rightY *= -1;
+    }
 
     Serial.println(leftY);
     Serial.println(rightY);
@@ -139,35 +160,5 @@ class Suspension
     }
     pidGyro.clearPower();
     gyro.clear();
-  }
-
-  bool zeroPoint(bool t)
-  {
-    if(!t)
-    {
-      zeroTime = millis();
-      T = true;
-    }
-    if(millis() - zeroTime >= 2000)
-    {
-      return true;
-    }
-    else
-    {
-      for(auto& motor : motors) 
-      {
-        motor.move( - pidGyro(gyro.getAngle() , 0));
-      }
-      return false;
-    }
-  }
-
-  bool operator()()
-  {
-    return T;
-  }
-  void operator()(bool t)
-  {
-    T = t;
   }
 };
