@@ -86,27 +86,27 @@ void loop()
 
       if(pad.getR1().press)
       {
-        Serial.println( 100 );
+        //Serial.println( 100 );
         destroyer.setMessage( powers[0] );
       }
       else if(pad.getL1().press)
       {
-        Serial.println( -100 );
+        //Serial.println( -100 );
         destroyer.setMessage( powers[1] );
       }
       else if(pad.getR2().press)
       {
-        Serial.println( 20 );
+        //Serial.println( 20 );
         destroyer.setMessage( powers[2] );
       }
       else if(pad.getL2().press)
       {
-        Serial.println( -20 );
+        //Serial.println( -20 );
         destroyer.setMessage( powers[3] );
       }
       else 
       {
-        Serial.println( 0 );
+        //Serial.println( 0 );
         destroyer.setMessage( {0} );
       }
 

@@ -48,17 +48,45 @@ class Suspension
     }
     if (millis() - turnTime < 500) 
     {
-      gyro.clear();
+      //gyro.clear();
+      stickAngle = gyro.getAngle();
     }
 
     Serial.println(gyro.getAngle() * -1);
-    if(stickAngle <= abs(Udon::Pi / 2))
+    if(abs(stickAngle - gyro.getAngle()) <= abs(Udon::Pi / 2))
     {
       pidGyro.update(gyro.getAngle() * -1, stickAngle);//怖い
     }
     else
     {
-      pidGyro.update(gyro.getAngle() * -1, stickAngle / -2);
+      if(abs(stickAngle) < Udon::Pi / 2)
+      {
+        if(stickAngle > 0)
+        {
+          // pidGyro.update(gyro.getAngle() * -1, stickAngle * -1 -2( Udon::Pi / 2 + stickAngle));
+          pidGyro.update(gyro.getAngle() * -1, stickAngle * -1 + 2*( Udon::Pi / 2 + stickAngle));
+        }
+        else if(stickAngle < 0)
+        {
+          //pidGyro.update(gyro.getAngle() * -1, stickAngle * -1 -2( Udon::Pi / 2 - stickAngle));
+          pidGyro.update(gyro.getAngle() * -1, stickAngle * -1 - 2*( Udon::Pi / 2 + stickAngle));
+        }
+        else
+        {
+          pidGyro.update(gyro.getAngle() * -1, 0 );
+        }
+      }
+      else if(abs(stickAngle) > Udon::Pi / 2);
+      {
+        if(stickAngle > 0)
+        {
+          pidGyro.update(gyro.getAngle() * -1, (stickAngle + 2*(Udon::Pi / 2 + ( -Udon::Pi - stickAngle))) * -1);
+        }
+        else if(stickAngle < 0)
+        {
+          pidGyro.update(gyro.getAngle() * -1, (stickAngle - 2*(Udon::Pi / 2 - (Udon::Pi - stickAngle))) * -1);
+        }
+      }
     }
     moveInfo.turn -= pidGyro.getPower();
     Serial.println(stickAngle);
@@ -80,6 +108,7 @@ class Suspension
 
     Serial.println(leftMove);
     Serial.println(rightMove);
+
     motors[0].move( leftMove );
     motors[1].move( rightMove );
   }
