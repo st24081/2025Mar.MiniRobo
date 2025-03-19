@@ -52,12 +52,19 @@ class Suspension
     }
 
     Serial.println(gyro.getAngle() * -1);
-    pidGyro.update(gyro.getAngle() * -1, stickAngle);//怖い
+    if(stickAngle <= abs(Udon::Pi / 2))
+    {
+      pidGyro.update(gyro.getAngle() * -1, stickAngle);//怖い
+    }
+    else
+    {
+      pidGyro.update(gyro.getAngle() * -1, stickAngle / -2);
+    }
     moveInfo.turn -= pidGyro.getPower();
     Serial.println(stickAngle);
 
     double leftMove = length + moveInfo.turn;
-    double rightMove = length + moveInfo.turn;
+    double rightMove = -length + moveInfo.turn;
 
     auto&& maxP = abs(max(leftMove, rightMove));
     if(maxP > maxPower)
@@ -71,6 +78,8 @@ class Suspension
     leftMove = map(leftMove , -255 , 255 , -10000 , 10000 );
     rightMove = map(rightMove , -255 , 255 , -10000 , 10000 );
 
+    Serial.println(leftMove);
+    Serial.println(rightMove);
     motors[0].move( leftMove );
     motors[1].move( rightMove );
   }
@@ -82,6 +91,8 @@ class Suspension
     leftY = map( leftY , -255 , 255 , -10000 , 10000 );
     rightY = map( rightY , -255 , 255 , -10000 , 10000 );
 
+    Serial.println(leftY);
+    Serial.println(rightY);
     motors[0].move(leftY);
     motors[1].move(rightY);
   }

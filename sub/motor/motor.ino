@@ -6,6 +6,8 @@ Udon::Led led{ LED_BUILTIN };
 
 Udon::CanReader<Udon::Message::Motor> reader{ bus , 0x003 };
 
+Udon::PicoWDT wdt;
+
 Udon::Motor3 motor{ 3 , 5 , 4 };
 
 void setup() 
@@ -18,6 +20,7 @@ void setup()
 
 void loop() 
 {
+  wdt.update();
   bus.update();
   led.flush();
 
@@ -26,10 +29,21 @@ void loop()
     int16_t power = message -> power;
 
     motor.move(power);
-    Serial.println(power);
+    Serial.print(power);
   }
   else
   {
     motor.stop();
   }
+
+  if ((bool)bus) 
+  {
+    led.flush(500, 50);
+  } 
+  else 
+  {
+    led.flush(100, 30);
+  }
+
+  bus.show();
 }
