@@ -29,11 +29,11 @@ class Suspension
     gyro.begin();
   }
 
-  void moveLikeOmni(Udon::Stick moveInfo, double maxPower)
+  void moveLikeOmni(Udon::Stick moveInfo, double limitPower)
   {
     gyro.update();
-    Udon::Vec2 maxVec{ 255 , 255 };
-    double length = map(moveInfo.vector.length() , -maxVec.length() , maxVec.length() , -255 , 255);
+    double length = moveInfo.vector.length();
+    Serial.println(length);
 
     double stickAngle = 0;
     if(moveInfo.vector.x || moveInfo.vector.y )
@@ -41,66 +41,71 @@ class Suspension
       stickAngle = moveInfo.vector.angle();
     }
 
-    moveInfo *= ( maxPower / 255 );
     if (moveInfo.turn) 
     {
       turnTime = millis();
     }
     if (millis() - turnTime < 500) 
     {
-      //gyro.clear();
-      stickAngle = gyro.getAngle();
+      gyro.clear();
+      //stickAngle = gyro.getAngle();
     }
 
     Serial.println(gyro.getAngle() * -1);
-    if(abs(stickAngle - gyro.getAngle()) <= abs(Udon::Pi / 2))
-    {
+    // if(abs(stickAngle - gyro.getAngle()) <= abs(Udon::Pi / 2))
+    // {
       pidGyro.update(gyro.getAngle() * -1, stickAngle);//怖い
-    }
-    else
-    {
-      if(abs(stickAngle) < Udon::Pi / 2)
-      {
-        if(stickAngle > 0)
-        {
-          // pidGyro.update(gyro.getAngle() * -1, stickAngle * -1 -2( Udon::Pi / 2 + stickAngle));
-          pidGyro.update(gyro.getAngle() * -1, stickAngle * -1 + 2*( Udon::Pi / 2 + stickAngle));
-        }
-        else if(stickAngle < 0)
-        {
-          //pidGyro.update(gyro.getAngle() * -1, stickAngle * -1 -2( Udon::Pi / 2 - stickAngle));
-          pidGyro.update(gyro.getAngle() * -1, stickAngle * -1 - 2*( Udon::Pi / 2 + stickAngle));
-        }
-        else
-        {
-          pidGyro.update(gyro.getAngle() * -1, 0 );
-        }
-      }
-      else if(abs(stickAngle) > Udon::Pi / 2);
-      {
-        if(stickAngle > 0)
-        {
-          pidGyro.update(gyro.getAngle() * -1, (stickAngle + 2*(Udon::Pi / 2 + ( -Udon::Pi - stickAngle))) * -1);
-        }
-        else if(stickAngle < 0)
-        {
-          pidGyro.update(gyro.getAngle() * -1, (stickAngle - 2*(Udon::Pi / 2 - (Udon::Pi - stickAngle))) * -1);
-        }
-      }
-    }
+    // }
+    // else
+    // {
+    //   if(abs(stickAngle) < Udon::Pi / 2)
+    //   {
+    //     if(stickAngle > 0)
+    //     {
+    //       // pidGyro.update(gyro.getAngle() * -1, stickAngle * -1 -2( Udon::Pi / 2 + stickAngle));
+    //       pidGyro.update(gyro.getAngle() * -1, stickAngle * -1 + 2*( Udon::Pi / 2 + stickAngle));
+    //     }
+    //     else if(stickAngle < 0)
+    //     {
+    //       //pidGyro.update(gyro.getAngle() * -1, stickAngle * -1 -2( Udon::Pi / 2 - stickAngle));
+    //       pidGyro.update(gyro.getAngle() * -1, stickAngle * -1 - 2*( Udon::Pi / 2 + stickAngle));
+    //     }
+    //     else
+    //     {
+    //       pidGyro.update(gyro.getAngle() * -1, 0 );
+    //     }
+    //   }
+    //   else if(abs(stickAngle) > Udon::Pi / 2);
+    //   {
+    //     if(stickAngle > 0)
+    //     {
+    //       pidGyro.update(gyro.getAngle() * -1, (stickAngle + 2*(Udon::Pi / 2 + ( -Udon::Pi - stickAngle))) * -1);
+    //     }
+    //     else if(stickAngle < 0)
+    //     {
+    //       pidGyro.update(gyro.getAngle() * -1, (stickAngle - 2*(Udon::Pi / 2 - (Udon::Pi - stickAngle))) * -1);
+    //     }
+    //   }
+    // }
     moveInfo.turn -= pidGyro.getPower();
     Serial.println(stickAngle);
 
-    double leftMove = length + moveInfo.turn;
-    double rightMove = -length + moveInfo.turn;
+    double leftMove = -length + moveInfo.turn;
+    double rightMove = length + moveInfo.turn;
 
-    auto&& maxP = abs(max(leftMove, rightMove));
-    if(maxP > maxPower)
-    {
-      const auto ratio = maxPower / maxP;
-      leftMove *= ratio;
-      rightMove *= ratio;
-    }
+    Serial.println(leftMove);
+    Serial.println(rightMove);
+
+    // const double maxPower = max(abs(leftMove,rightMove));
+    // if (maxPower > limitPower)
+    // {
+    //   const double ratio = limitPower / maxPower;
+    //   leftMove *= ratio;
+    //   rightMove *= ratio;
+    // }
+
+    leftMove = map(leftMove , -255 , 255 , -limitPower , limitPower );
+    rightMove = map(rightMove , -255 , 255 , -limitPower , limitPower );
 
     //moveInfo = map(moveInfo , -255 , 255 , -10000 , 10000 );
     leftMove = map(leftMove , -255 , 255 , -10000 , 10000 );

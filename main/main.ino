@@ -28,15 +28,15 @@ Suspension suspension
     RoboMasFB
     {
       Udon::RoboMasterC610{ motorBus , 1 },
-      Udon::PidController{ 3 , 0 , 0 , loopCtrl.cycleUs() }
+      Udon::PidController{ 3 , 0.01 , 0.2 , loopCtrl.cycleUs() }
     },
     RoboMasFB
     {
       Udon::RoboMasterC610{ motorBus , 2 },
-      Udon::PidController{ 3 , 0 , 0 , loopCtrl.cycleUs() }
+      Udon::PidController{ 3 , 0.01 , 0.2 , loopCtrl.cycleUs() }
     }
   },
-  Udon::PidController{ 4 , 0 , 0 , loopCtrl.cycleUs() }, //Gyro
+  Udon::PidController{ 40 , 0.01 , 10 , loopCtrl.cycleUs() }, //Gyro
   Gyro{ Udon::BNO055{ Wire } }
 };
 double maxPower = 30;
@@ -73,8 +73,8 @@ void loop()
 
   if(pad.isOperable())
   {
-    if(flag())
-    {
+    // if(flag())
+    // {
       if(!pad.getSquare().toggle)
       {
         suspension.moveLikeOmni(pad.getMoveInfo() , maxPower);
@@ -115,14 +115,14 @@ void loop()
         suspension(false);
         flag(false);
       }
-    }
-    else
-    {
-      if(suspension.zeroPoint(suspension()))
-      {
-        flag(true);
-      }
-    }
+    //}
+    // else
+    // {
+    //   if(suspension.zeroPoint(suspension()))
+    //   {
+    //     flag(true);
+    //   }
+    // }
   }
   else
   {
