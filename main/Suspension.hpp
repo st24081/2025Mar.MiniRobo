@@ -29,8 +29,18 @@ class Suspension
     gyro.begin();
   }
 
-  void moveLikeOmni(Udon::Stick moveInfo, Udon::Vec2 LeftStick , double maxPower)
+  void moveLikeOmni(Udon::Stick moveInfo, double maxPower)
   {
+    gyro.update();
+    Udon::Vec2 maxVec{ 255 , 255 };
+    double length = map(moveInfo.vector.length() , -maxVec.length() , maxVec.length() , -255 , 255);
+
+    double stickAngle = 0;
+    if(moveInfo.vector.x || moveInfo.vector.y )
+    {
+      stickAngle = moveInfo.vector.angle();
+    }
+
     moveInfo *= ( maxPower / 255 );
     if (moveInfo.turn) 
     {
@@ -38,19 +48,16 @@ class Suspension
     }
     if (millis() - turnTime < 500) 
     {
-      gyro.clear();  
+      gyro.clear();
     }
-    
-    double stickAngle = 0;
-    if(LeftStick.x || LeftStick.y )
-    {
-      stickAngle = LeftStick.angle();
-    }
-    //下のgetAngleをいじるか新しい関数を作って疑似ポジティブ制御を行いたい
-    moveInfo.turn -= pidGyro(gyro.getAngle() , stickAngle);//怖い
 
-    double leftMove = moveInfo.vector.y + moveInfo.turn;
-    double rightMove = -moveInfo.vector.y + moveInfo.turn;
+    Serial.println(gyro.getAngle() * -1);
+    pidGyro.update(gyro.getAngle() * -1, stickAngle);//怖い
+    moveInfo.turn -= pidGyro.getPower();
+    Serial.println(stickAngle);
+
+    double leftMove = length + moveInfo.turn;
+    double rightMove = length + moveInfo.turn;
 
     auto&& maxP = abs(max(leftMove, rightMove));
     if(maxP > maxPower)
@@ -96,7 +103,7 @@ class Suspension
       zeroTime = millis();
       T = true;
     }
-    if(millis() - zeroTime > 2000)
+    if(millis() - zeroTime >= 2000)
     {
       return true;
     }

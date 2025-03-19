@@ -1,17 +1,17 @@
 #include <Udon.hpp>
-#include <Wire.h>
 #include "Suspension.hpp"
 #include "Gyro.hpp"
 #include "RoboMasFB.hpp"
 #include "flag.hpp"
 
 //ロボマス2つで足回り
-//555を1つで破壊機構 R1
+//735を1つで破壊機構 R1
 Udon::LoopCycleController loopCtrl{ 10000 };
 
 Udon::Led led{ LED_BUILTIN };
 
-Udon::CanBusTeensy<CAN1> bus;
+Udon::CanBusTeensy<CAN1> comBus;
+Udon::CanBusTeensy<CAN2> motorBus;
 
 Udon::E220PadPS5 pad
   ({
@@ -27,49 +27,49 @@ Suspension suspension
   {
     RoboMasFB
     {
-      Udon::RoboMasterC610{ bus , 1 },
-      Udon::PidController{ 0 , 0 , 0 , loopCtrl.cycleUs() }
+      Udon::RoboMasterC610{ motorBus , 1 },
+      Udon::PidController{ 3 , 0 , 0 , loopCtrl.cycleUs() }
     },
     RoboMasFB
     {
-      Udon::RoboMasterC610{ bus , 2 },
-      Udon::PidController{ 0 , 0 , 0 , loopCtrl.cycleUs() }
+      Udon::RoboMasterC610{ motorBus , 2 },
+      Udon::PidController{ 3 , 0 , 0 , loopCtrl.cycleUs() }
     }
   },
-  Udon::PidController{ 0 , 0 , 0 , loopCtrl.cycleUs() }, //Gyro
+  Udon::PidController{ 4 , 0 , 0 , loopCtrl.cycleUs() }, //Gyro
   Gyro{ Udon::BNO055{ Wire } }
 };
-double maxPower = 100;
+double maxPower = 30;
 
 //555
-Udon::CanWriter<Udon::Message::Motor> destroyer
-{
-  bus , 0x003
-};
+Udon::CanWriter<Udon::Message::Motor> destroyer{  comBus , 0x003 };
 
 std::array<Udon::Message::Motor , 4> powers
 {
-  Udon::Message::Motor{ .power = 210, },
-  Udon::Message::Motor{ .power = -210, },
   Udon::Message::Motor{ .power = 100, },
-  Udon::Message::Motor{ .power = -100, }
+  Udon::Message::Motor{ .power = -100, },
+  Udon::Message::Motor{ .power = 20, },
+  Udon::Message::Motor{ .power = -20, }
 };
 
 Flag flag;
 
 void setup() 
 {
-  pad.begin();
-  bus.begin();
+  pad.begin(2);
+  motorBus.begin();
+  comBus.begin();
   led.begin();
   Serial.begin(115200);
+  suspension.begin();
 }
 
 void loop() 
 {
   led.flush();
   pad.update();
-  bus.update();
+  motorBus.update();
+  comBus.update();
 
   if(pad.isOperable())
   {
@@ -77,7 +77,7 @@ void loop()
     {
       if(!pad.getSquare().toggle)
       {
-        suspension.moveLikeOmni(pad.getMoveInfo() , pad.getLeftStick() , maxPower);
+        suspension.moveLikeOmni(pad.getMoveInfo() , maxPower);
       }
       else
       {
@@ -120,5 +120,7 @@ void loop()
     suspension.stop();
   }
 
+  Udon::Show(pad.getMessage());
+  Serial.println();
   loopCtrl.update();
 }

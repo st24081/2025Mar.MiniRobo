@@ -21,6 +21,8 @@ public:
         double realAngle = gyro.getQuaternion().toYaw();
 
         angle = wrapAngle(realAngle, lastAngle);
+        // Serial.println(angle);
+        // Serial.println(realAngle);
         // ジャイロセンサは Pi ~ -Pi で返ってくる(絶対角度)なので、
         // Pi -> -Pi のときや -Pi -> Pi のときに注意しないと暴走する
 

@@ -13,6 +13,7 @@ void setup()
   bus.begin();
   motor.begin();
   led.begin();
+  Serial.begin(115200);
 }
 
 void loop() 
@@ -25,6 +26,7 @@ void loop()
     int16_t power = message -> power;
 
     motor.move(power);
+    Serial.println(power);
   }
   else
   {
