@@ -36,19 +36,19 @@ class Suspension
     Serial.println(length);
 
     double stickAngle = 0;
-    if(!L2)
-    {
+    // if(!L2)
+    // {
       if(moveInfo.vector.x || moveInfo.vector.y )
       {
         stickAngle = moveInfo.vector.angle();
       }
-    }
-    else
-    {
-      stickAngle = Udon::Pi;
-      moveInfo.vector *= -1; 
-      stickAngle = moveInfo.vector.angle();
-    }
+    // }
+    // else
+    // {
+    //   stickAngle = Udon::Pi;
+    //   moveInfo.vector *= -1; 
+    //   stickAngle = moveInfo.vector.angle();
+    // }
 
     if (moveInfo.turn) 
     {
@@ -70,13 +70,30 @@ class Suspension
     { 
       if(stickAngle > 0)
       {
-        pidGyro.update(gyro.getAngle() * -1, stickAngle - Udon::Pi);
-          Serial.println("B.A");
+        if(gyro.getAngle() * -1 < 0)
+        {
+          pidGyro.update(gyro.getAngle() * -1, stickAngle - Udon::Pi);
+          Serial.println("B.A.A");
+        }
+        else
+        {
+          pidGyro.update(gyro.getAngle() * -1, stickAngle * -1);
+          Serial.println("B.A.B");
+        }
+        
       }
       else if(stickAngle < 0)
       {
-        pidGyro.update(gyro.getAngle() * -1, stickAngle + Udon::Pi);
-        Serial.println("B.B");
+        if(gyro.getAngle() * -1 > 0)
+        {
+          pidGyro.update(gyro.getAngle() * -1, stickAngle + Udon::Pi);
+          Serial.println("B.B.A");
+        }
+        else
+        {
+          pidGyro.update(gyro.getAngle() * -1, stickAngle * -1);
+          Serial.println("B.B.B");
+        }
       }
       else
       {
@@ -97,16 +114,16 @@ class Suspension
     double leftMove = 0;
     double rightMove = 0;
 
-    if(!L2)
-    {
+    // if(!L2)
+    // {
       leftMove = -length + moveInfo.turn;
       rightMove = length + moveInfo.turn;
-    }
-    else
-    {
-      leftMove = length + moveInfo.turn;
-      rightMove = -length + moveInfo.turn;
-    }
+    // }
+    // else
+    // {
+    //   leftMove = length + moveInfo.turn;
+    //   rightMove = -length + moveInfo.turn;
+    // }
 
     Serial.println(leftMove);
     Serial.println(rightMove);
