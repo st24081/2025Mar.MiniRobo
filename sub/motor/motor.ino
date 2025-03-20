@@ -8,7 +8,7 @@ Udon::CanReader<Udon::Message::Motor> reader{ bus , 0x003 };
 
 Udon::PicoWDT wdt;
 
-Udon::Motor3 motor{ 3 , 5 , 4 };
+Udon::Motor3 motor{ 8 , 10 , 9 };
 
 void setup() 
 {
