@@ -28,28 +28,28 @@ Suspension suspension
     RoboMasFB
     {
       Udon::RoboMasterC610{ motorBus , 1 },
-      Udon::PidController{ 1 , 0. , 0.01 , loopCtrl.cycleUs() }
+      Udon::PidController{ 1 , 0 , 0.01 , loopCtrl.cycleUs() }
     },
     RoboMasFB
     {
       Udon::RoboMasterC610{ motorBus , 2 },
-      Udon::PidController{ 1 , 0. , 0.01 , loopCtrl.cycleUs() }
+      Udon::PidController{ 1 , 0 , 0.01 , loopCtrl.cycleUs() }
     }
   },
   Udon::PidController{ 40 , 0.01 , 10 , loopCtrl.cycleUs() }, //Gyro
   Gyro{ Udon::BNO055{ Wire } }
 };
-double maxPower = 80;
+double maxPower = 40;
 
 //555
 Udon::CanWriter<Udon::Message::Motor> destroyer{ comBus , 0x003 };
 
 std::array<Udon::Message::Motor , 4> powers
 {
-  Udon::Message::Motor{ .power = 100, },
-  Udon::Message::Motor{ .power = -100, },
-  Udon::Message::Motor{ .power = 20, },
-  Udon::Message::Motor{ .power = -20, }
+  Udon::Message::Motor{ .power = 210, },
+  Udon::Message::Motor{ .power = -210, },
+  Udon::Message::Motor{ .power = 80, },
+  Udon::Message::Motor{ .power = -80, }
 };
 
 Flag flag;

@@ -61,51 +61,51 @@ class Suspension
     }
 
     Serial.println(gyro.getAngle() * -1);
-    // if(abs(stickAngle - gyro.getAngle()) <= abs(Udon::Pi / 2))
-    // {
+    if(abs(stickAngle - gyro.getAngle() * -1) <= Udon::Pi / 2 || abs(stickAngle - gyro.getAngle() * -1) >= 3 * Udon::Pi / 2)
+    {
       pidGyro.update(gyro.getAngle() * -1, stickAngle);//怖い
-    // }
-    // else
-    // {
-    //   if(abs(stickAngle) < Udon::Pi / 2)
-    //   {
-    //     if(stickAngle > 0)
-    //     {
-    //       // pidGyro.update(gyro.getAngle() * -1, stickAngle * -1 -2( Udon::Pi / 2 + stickAngle));
-    //       pidGyro.update(gyro.getAngle() * -1, stickAngle * -1 + 2*( Udon::Pi / 2 + stickAngle));
-    //     }
-    //     else if(stickAngle < 0)
-    //     {
-    //       //pidGyro.update(gyro.getAngle() * -1, stickAngle * -1 -2( Udon::Pi / 2 - stickAngle));
-    //       pidGyro.update(gyro.getAngle() * -1, stickAngle * -1 - 2*( Udon::Pi / 2 + stickAngle));
-    //     }
-    //     else
-    //     {
-    //       pidGyro.update(gyro.getAngle() * -1, 0 );
-    //     }
-    //   }
-    //   else if(abs(stickAngle) > Udon::Pi / 2);
-    //   {
-    //     if(stickAngle > 0)
-    //     {
-    //       pidGyro.update(gyro.getAngle() * -1, (stickAngle + 2*(Udon::Pi / 2 + ( -Udon::Pi - stickAngle))) * -1);
-    //     }
-    //     else if(stickAngle < 0)
-    //     {
-    //       pidGyro.update(gyro.getAngle() * -1, (stickAngle - 2*(Udon::Pi / 2 - (Udon::Pi - stickAngle))) * -1);
-    //     }
-    //   }
-    // }
+      Serial.println("A");
+    }
+    else
+    { 
+      if(stickAngle > 0)
+      {
+        pidGyro.update(gyro.getAngle() * -1, stickAngle - Udon::Pi);
+          Serial.println("B.A");
+      }
+      else if(stickAngle < 0)
+      {
+        pidGyro.update(gyro.getAngle() * -1, stickAngle + Udon::Pi);
+        Serial.println("B.B");
+      }
+      else
+      {
+        if(gyro.getAngle() * -1 < 0)
+        {
+          pidGyro.update(gyro.getAngle() * -1, -Udon::Pi );
+        }
+        else
+        {
+          pidGyro.update(gyro.getAngle() * -1, Udon::Pi );
+        }
+        Serial.println("B.C");
+      }
+    }
     moveInfo.turn -= pidGyro.getPower();
     Serial.println(stickAngle);
     
-    double leftMove = -length + moveInfo.turn;
-    double rightMove = length + moveInfo.turn;
+    double leftMove = 0;
+    double rightMove = 0;
 
-    if(L2)
+    if(!L2)
     {
-      leftMove *= -1;
-      rightMove *= -1;
+      leftMove = -length + moveInfo.turn;
+      rightMove = length + moveInfo.turn;
+    }
+    else
+    {
+      leftMove = length + moveInfo.turn;
+      rightMove = -length + moveInfo.turn;
     }
 
     Serial.println(leftMove);
