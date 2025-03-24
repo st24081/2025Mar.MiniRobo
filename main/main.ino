@@ -36,20 +36,19 @@ Suspension suspension
       Udon::PidController{ 1 , 0 , 0.01 , loopCtrl.cycleUs() }
     }
   },
-  Udon::PidController{ 40 , 0.01 , 10 , loopCtrl.cycleUs() }, //Gyro
+  Udon::PidController{ 150 , 0.4 ,40 , loopCtrl.cycleUs()}, //Gyro
   Gyro{ Udon::BNO055{ Wire } }
 };
-double maxPower = 40;
+double maxPower = 140;
 
 //555
 Udon::CanWriter<Udon::Message::Motor> destroyer{ comBus , 0x003 };
 
-std::array<Udon::Message::Motor , 4> powers
+std::array<Udon::Message::Motor , 3> powers
 {
-  Udon::Message::Motor{ .power = 210, },
-  Udon::Message::Motor{ .power = -210, },
-  Udon::Message::Motor{ .power = 80, },
-  Udon::Message::Motor{ .power = -80, }
+  Udon::Message::Motor{ .power = 255, },
+  Udon::Message::Motor{ .power = 30, },
+  Udon::Message::Motor{ .power = -40, },
 };
 
 Flag flag;
@@ -77,7 +76,10 @@ void loop()
     // {
       if(!pad.getSquare().toggle)
       {
-        suspension.moveLikeOmni(pad.getMoveInfo() , maxPower , pad.getL2().press);
+        const bool stick = suspension.StickMove();
+        // Serial.println(suspension.StickMove());
+        suspension.moveLikeOmni(pad.getMoveInfo() , maxPower , stick , pad.getL2().press);
+        // Serial.println(suspension.LastAngle());
       }
       else
       {
@@ -103,6 +105,11 @@ void loop()
       {
         //Serial.println( 0 );
         destroyer.setMessage( {0} );
+      }
+
+      if(pad.getTouch().click)
+      {
+        suspension.GyroClear();
       }
 
       // if(pad.getUp().click)
